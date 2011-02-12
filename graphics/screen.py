@@ -5,7 +5,52 @@
 
 # As such, our class needs a reference to it, to do ANYTHING.
 
+import panda3d.core
+
 class LoadingScreen(object):
     def __init__(self,showbase):
-        self.sb = showbase
+        self.base = showbase
+        self.background()
 
+        self.lights()
+        self.camera()
+        self.teapot()
+        self.action()
+
+    def teapot(self):
+        # load the model, and attach it to the render tree
+        self.teapot = self.base.loader.loadModel('models/teapot')
+        self.teapot.reparentTo(self.base.render)
+        self.teapot.setPos(0,-20,-10)
+
+        self.teapot_movement = self.teapot.hprInterval(50,(0,360,360))
+        self.teapot_movement.loop()
+    def background(self):
+        self.base.setBackgroundColor(0,0,0,1)
+    def lights(self):
+        # make our directional lightnode, and attach it to the render tree
+        dlightnode = panda3d.core.DirectionalLight('light')
+        dlightnode.setColor((0.8,0.7,0.6,1))
+        dlight = self.base.render.attachNewNode(dlightnode)
+        # by setting dlight to light "render", it also lights all nodes
+        # attached to render's subtree, as in, everything
+        self.base.render.setLight(dlight)
+
+        # same for ambient light
+        alightnode = panda3d.core.DirectionalLight('ambient')
+        alightnode.setColor((0.2,0.2,0.2,1))
+        alight = self.base.render.attachNewNode(alightnode)
+        self.base.render.setLight(alight)
+    def camera(self):
+        self.base.camLens.setNearFar(1.0,10000)
+        self.base.camLens.setFov(75)
+    def action(self):
+        pass
+
+if __name__=='__main__':
+    # This is mostly debugging test stuff, and will not be run when
+    # this is called on as a module.
+    import direct.showbase.ShowBase
+    s = direct.showbase.ShowBase.ShowBase()
+    loadingscreen = LoadingScreen(s)
+    s.run()
