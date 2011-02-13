@@ -38,7 +38,7 @@ class MainView(object):
         # tree to see anything.
         self.camera_np.reparentTo(self.base.render)
 
-        self.set_up_event_handlers()Q
+        self.set_up_event_handlers()
 
     def set_up_event_handlers(self):
         self.base.accept('mouse2',self.watch_mouse)
@@ -50,7 +50,7 @@ class MainView(object):
     def stop_watching_mouse(self):
         self.base.taskMgr.remove('main-view mouse watch')
 
-    def mouse_monitor_task(self,task)
+    def mouse_monitor_task(self,task):
         x = self.base.mouseWatcherNode.getMouseX()
         y = self.base.mouseWatcherNode.getMouseY()
 
