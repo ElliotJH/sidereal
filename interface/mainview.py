@@ -5,6 +5,7 @@ TODO this doc is clearly incomplete."""
 
 # stdlib
 import collections
+import math
 
 # third party
 import panda3d.core
@@ -65,6 +66,35 @@ class MainView(object):
             # the camera to the left. TODO
 
         return direct.task.Task.cont # do the same next frame
+
+class SpherePoint(object):
+    """Manipulating a camera on a sphere's surface seems complicated.
+    As such, this class SHOULD be helpful in that.
+    
+    Imagine the camera as a point on the sphere, which if you take a 
+    2d flat horizontal slice is a circle. The camera is somewhere on
+    that circle, at a certain angle. Where you take the 2d slice
+    could be called the vertical.
+     
+    The radius of the sphere should be obvious.
+    
+    This sphere is centered on 0,0,0"""
+    def __init__(self,radius,angle,vertical):
+        """
+        Radius is a positive number.
+        Angle is 0 < a < 2pi
+        Vertical ranges from 0 < v < 1
+        """
+        self.radius = radius
+        self.angle = angle
+        self.vertical = vertical
+    def calculate(self):
+        slice_r = self.radius * math.sin(self.vertical * math.pi)
+        x = slice_r * math.sin(self.angle)
+        y = slice_r * math.cos(self.angle)
+        z = (2 * self.radius * self.vertical) - self.radius
+        return (x,y,z) # Remember, the center of this sphere is 0,0,0
+
 class FocusManager(collections.MutableSet):
     """The FocusManager the utility for maintaining focus on one to many
     game objects, with none being a special case.
