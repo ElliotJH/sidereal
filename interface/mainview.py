@@ -42,8 +42,10 @@ class MainView(object):
 
         self.focuspoint = (0,0,0)
         self.zoom = 100
-
-        self.sensitivity = 50 # Higher is more sensitive
+        
+        # setting sensitivity to negative inverts the axis
+        self.horizontal_sensitivity = -2 # Higher is more precise
+        self.vertical_sensitivity = 5
         self.spherepoint = SpherePoint(self.zoom,0,0.5)
 
         self.set_up_event_handlers()
@@ -55,8 +57,8 @@ class MainView(object):
         #self.base.taskMgr.doMethodLater(0.5,self._randomise_spherepoint,'randomise')
 
     def watch_mouse(self):
-        self.mouse_coords = []
-        self.base.taskMgr.add(self.mouse_monitor_task, 'main-view mouse watch')
+        self.mouse_coords = ()
+        self.base.taskMgr.doMethodLater(0.1,self.mouse_monitor_task, 'main-view mouse watch')
     def stop_watching_mouse(self):
         self.base.taskMgr.remove('main-view mouse watch')
 
@@ -64,27 +66,39 @@ class MainView(object):
         x = self.base.mouseWatcherNode.getMouseX()
         y = self.base.mouseWatcherNode.getMouseY()
 
-        if self.mouse_coords == []:
-            self.mouse_coords = [x,y]
-        else:
-            dx = self.mouse_coords[0] - x
-            dy = self.mouse_coords[1] - y
+        print x,y
 
-            # then based on the dx,dy move the mainview's camera around its
-            # focused point. Preferable moving the mouse left, also rotates
-            # the camera to the left.
+        # If the coords are empty, then skip this whole block
+        if self.mouse_coords is ():
+            self.mouse_coords = (x,y)
+            return direct.task.Task.cont # do the same next frame
 
-            angle = self.spherepoint.angle
-            angle += dx / self.sensitivity
-            angle %= math.pi * 2
-            self.spherepoint.angle = angle
+        dx = self.mouse_coords[0] - x
+        dy = self.mouse_coords[1] - y
 
-            vertical = self.spherepoint.vertical
-            vertical += dy / self.sensitivity
-            vertical = max(vertical,1)
-            vertical = min(vertical,0)
-            self.spherepoint.vertical = vertical
+        print dx,dy
 
+        # then based on the dx,dy move the mainview's camera around its
+        # focused point. Preferable moving the mouse left, also rotates
+        # the camera to the left.
+
+        angle = self.spherepoint.angle
+        angle += dx / self.horizontal_sensitivity
+        angle %= math.pi * 2
+        self.spherepoint.angle = angle
+
+        vertical = self.spherepoint.vertical
+        vertical += dy / self.vertical_sensitivity
+        vertical = min(vertical,1)
+        vertical = max(vertical,0.000001)
+        self.spherepoint.vertical = vertical
+            
+        self.mouse_coords = (x,y) 
+
+        print self.spherepoint
+
+        self.camera_np.setPos(*self.spherepoint.calculate())
+        self.camera_np.lookAt((0,0,0))
 
         return direct.task.Task.again # do the same after delay
     def _randomise_spherepoint(self,task):
@@ -115,6 +129,8 @@ class SpherePoint(object):
         self.radius = radius
         self.angle = angle
         self.vertical = vertical
+    def __repr__(self):
+        return "SpherePoint({0},{1},{2})".format(self.radius,self.angle,self.vertical)
     def calculate(self):
         slice_r = self.radius * math.sin(self.vertical * math.pi)
         x = slice_r * math.sin(self.angle)
