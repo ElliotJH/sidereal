@@ -22,6 +22,7 @@ class TeapotScreen(object):
     def setup(self):
         self.background()
         self.teapot()
+        self.rotate()
         self.lights()
         self.camera()
         self.onscreen_text()
@@ -32,10 +33,10 @@ class TeapotScreen(object):
         self.teapot = self.base.loader.loadModel('models/teapot')
         self.teapot.reparentTo(self.base.render)
         self.teapot.setPos(0,0,0)
-
+        self.teapot.setColor(1,1,1,1)
+    def rotate(self):
         self.teapot_movement = self.teapot.hprInterval(50,(0,360,360))
         self.teapot_movement.loop()
-        self.teapot.setColor(1,1,1,1)
     def background(self):
         self.base.setBackgroundColor(0,0,0,1)
     def onscreen_text(self):
