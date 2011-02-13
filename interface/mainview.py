@@ -5,6 +5,7 @@ TODO this doc is clearly incomplete."""
 
 # stdlib
 import collections
+import random
 import math
 
 # third party
@@ -48,8 +49,10 @@ class MainView(object):
         self.set_up_event_handlers()
 
     def set_up_event_handlers(self):
-        self.base.accept('mouse2',self.watch_mouse)
-        self.base.accept('mouse2-up',self.stop_watching_mouse)
+        self.base.accept('mouse3',self.watch_mouse)
+        self.base.accept('mouse3-up',self.stop_watching_mouse)
+
+        #self.base.taskMgr.doMethodLater(0.5,self._randomise_spherepoint,'randomise')
 
     def watch_mouse(self):
         self.mouse_coords = []
@@ -83,7 +86,13 @@ class MainView(object):
             self.spherepoint.vertical = vertical
 
 
-        return direct.task.Task.cont # do the same next frame
+        return direct.task.Task.again # do the same after delay
+    def _randomise_spherepoint(self,task):
+        self.spherepoint.vertical = random.random()
+        self.spherepoint.angle = random.random() * math.pi * 2
+        self.camera_np.setPos(*self.spherepoint.calculate())
+        self.camera_np.lookAt((0,0,0))
+        return direct.task.Task.again
 
 class SpherePoint(object):
     """Manipulating a camera on a sphere's surface seems complicated.
