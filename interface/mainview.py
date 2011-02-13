@@ -39,6 +39,12 @@ class MainView(object):
         # tree to see anything.
         self.camera_np.reparentTo(self.base.render)
 
+        self.focuspoint = (0,0,0)
+        self.zoom = 100
+
+        self.sensitivity = 50 # Higher is more sensitive
+        self.spherepoint = SpherePoint(self.zoom,0,0.5)
+
         self.set_up_event_handlers()
 
     def set_up_event_handlers(self):
@@ -63,7 +69,19 @@ class MainView(object):
 
             # then based on the dx,dy move the mainview's camera around its
             # focused point. Preferable moving the mouse left, also rotates
-            # the camera to the left. TODO
+            # the camera to the left.
+
+            angle = self.spherepoint.angle
+            angle += dx / self.sensitivity
+            angle %= math.pi * 2
+            self.spherepoint.angle = angle
+
+            vertical = self.spherepoint.vertical
+            vertical += dy / self.sensitivity
+            vertical = max(vertical,1)
+            vertical = min(vertical,0)
+            self.spherepoint.vertical = vertical
+
 
         return direct.task.Task.cont # do the same next frame
 
