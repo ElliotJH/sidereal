@@ -22,6 +22,9 @@ bin
 develop-eggs
 .installed.cfg
 
+# Compiled modules
+*.py[co]
+
 # Installer logs
 pip-log.txt
 
