@@ -15,13 +15,13 @@ import direct.gui.DirectGui
 
 import random
 
-class LoadingScreen(object):
+class TeapotScreen(object):
     def __init__(self,showbase):
         self.base = showbase
+
+    def setup(self):
         self.background()
-
         self.teapot()
-
         self.lights()
         self.camera()
         self.onscreen_text()
@@ -89,5 +89,6 @@ if __name__=='__main__':
     # this is called on as a module.
     import direct.showbase.ShowBase
     s = direct.showbase.ShowBase.ShowBase()
-    loadingscreen = LoadingScreen(s)
+    screen = TeapotScreen(s)
+    screen.setup()
     s.run()
