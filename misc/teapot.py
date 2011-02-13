@@ -15,13 +15,14 @@ import direct.gui.DirectGui
 
 import random
 
-class LoadingScreen(object):
+class TeapotScreen(object):
     def __init__(self,showbase):
         self.base = showbase
+
+    def setup(self):
         self.background()
-
         self.teapot()
-
+        self.rotate()
         self.lights()
         self.camera()
         self.onscreen_text()
@@ -32,10 +33,10 @@ class LoadingScreen(object):
         self.teapot = self.base.loader.loadModel('models/teapot')
         self.teapot.reparentTo(self.base.render)
         self.teapot.setPos(0,0,0)
-
+        self.teapot.setColor(1,1,1,1)
+    def rotate(self):
         self.teapot_movement = self.teapot.hprInterval(50,(0,360,360))
         self.teapot_movement.loop()
-        self.teapot.setColor(1,1,1,1)
     def background(self):
         self.base.setBackgroundColor(0,0,0,1)
     def onscreen_text(self):
@@ -89,5 +90,6 @@ if __name__=='__main__':
     # this is called on as a module.
     import direct.showbase.ShowBase
     s = direct.showbase.ShowBase.ShowBase()
-    loadingscreen = LoadingScreen(s)
+    screen = TeapotScreen(s)
+    screen.setup()
     s.run()
