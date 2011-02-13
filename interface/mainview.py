@@ -3,7 +3,15 @@ of the spaceships and stuff around.
 
 TODO this doc is clearly incomplete."""
 
+# stdlib
 import collections
+
+# third party
+import panda3d.core
+import direct.task
+
+# internal
+
 
 # One thing I'm wondering about, is whether we implement the gui overlay
 # in a seperate space. How does it intercept the clicks, and know which one
@@ -23,6 +31,40 @@ class MainView(object):
     def __init__(self,showbase):
         self.base = showbase
 
+        # The mainview has its own camera.
+        self.camera = panda3d.core.Camera('MainView camera')
+        self.camera_np = panda3d.core.NodePath(self.camera)
+        # A camera is its own node. Although we need to attach it to the
+        # tree to see anything.
+        self.camera_np.reparentTo(self.base.render)
+
+        self.set_up_event_handlers()Q
+
+    def set_up_event_handlers(self):
+        self.base.accept('mouse2',self.watch_mouse)
+        self.base.accept('mouse2-up',self.stop_watching_mouse)
+
+    def watch_mouse(self):
+        self.mouse_coords = []
+        self.base.taskMgr.add(self.mouse_monitor_task, 'main-view mouse watch')
+    def stop_watching_mouse(self):
+        self.base.taskMgr.remove('main-view mouse watch')
+
+    def mouse_monitor_task(self,task)
+        x = self.base.mouseWatcherNode.getMouseX()
+        y = self.base.mouseWatcherNode.getMouseY()
+
+        if self.mouse_coords == []:
+            self.mouse_coords = [x,y]
+        else:
+            dx = self.mouse_coords[0] - x
+            dy = self.mouse_coords[1] - y
+
+            # then based on the dx,dy move the mainview's camera around its
+            # focused point. Preferable moving the mouse left, also rotates
+            # the camera to the left. TODO
+
+        return direct.task.Task.cont # do the same next frame
 class FocusManager(collections.MutableSet):
     """The FocusManager the utility for maintaining focus on one to many
     game objects, with none being a special case.
