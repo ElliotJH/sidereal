@@ -43,9 +43,15 @@ class MainView(object):
         self.focuspoint = (0,0,0)
         self.zoom = 100
         
+        # where max, is maximum zoom out
+        # where min, is minimum zoon in
+        self.maxzoom = 200
+        self.minzoom = 10
+        
         # setting sensitivity to negative inverts the axis
-        self.horizontal_sensitivity = -2 # Higher is more precise
-        self.vertical_sensitivity = 5
+        self.horizontal_sensitivity = -0.5 # Higher is more precise
+        # As in, slower
+        self.vertical_sensitivity = 1
         self.spherepoint = SpherePoint(self.zoom,0,0.5)
 
         self.set_up_event_handlers()
@@ -53,12 +59,20 @@ class MainView(object):
     def set_up_event_handlers(self):
         self.base.accept('mouse3',self.watch_mouse)
         self.base.accept('mouse3-up',self.stop_watching_mouse)
+        self.base.accept('wheel_up',self.adjust_zoom,[-10])
+        self.base.accept('wheel_down',self.adjust_zoom,[10])
 
         #self.base.taskMgr.doMethodLater(0.5,self._randomise_spherepoint,'randomise')
+    def adjust_zoom(self,adjustment):
+        self.zoom += adjustment
+        self.zoom = max(self.zoom,self.minzoom)
+        self.zoom = min(self.zoom,self.maxzoom)
+
+        self.spherepoint.radius = self.zoom
 
     def watch_mouse(self):
         self.mouse_coords = ()
-        self.base.taskMgr.doMethodLater(0.1,self.mouse_monitor_task, 'main-view mouse watch')
+        self.base.taskMgr.doMethodLater(0.01,self.mouse_monitor_task, 'main-view mouse watch')
     def stop_watching_mouse(self):
         self.base.taskMgr.remove('main-view mouse watch')
 
@@ -89,7 +103,7 @@ class MainView(object):
 
         vertical = self.spherepoint.vertical
         vertical += dy / self.vertical_sensitivity
-        vertical = min(vertical,1)
+        vertical = min(vertical,0.999999)
         vertical = max(vertical,0.000001)
         self.spherepoint.vertical = vertical
             
