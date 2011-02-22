@@ -25,6 +25,7 @@ _exampleconfiguration = {
          "damage":50
         }
     ],
+    "navlights":[(25,0,25),(-25,0,25)],
 }
 class Ship(object):
     """The basic core ship class in Sidereal."""
